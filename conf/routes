@@ -1,0 +1,10 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# https://www.playframework.com/documentation/latest/ScalaRouting
+#
+
+GET /api/ping           controllers.ApiController.ping
+
+# NEW
+GET /api/post/:postId           controllers.ApiController.getPost(postId: Int)
+GET /api/post/:postId/comments  controllers.ApiController.getComments(postId: Int)
