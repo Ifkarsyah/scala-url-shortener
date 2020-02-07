@@ -1,16 +1,7 @@
 package repositories
 
-import com.redis.RedisClient
+trait URLRepository {
+  def saveURL(base62URL: String, urlInfo: String): Boolean
 
-class URLRepository {
-  val dbConnection = new RedisClient("localhost", 6379)
-
-  def getLongURL(hashURL: String): Option[String] =  {
-    dbConnection.get(hashURL)
-  }
-
-  def saveURL(hashURL: String, originalURL: String): Boolean = {
-    dbConnection.set(hashURL, Map("originalURL" -> originalURL))
-  }
+  def getURLInfo(base62URL: String): Option[String]
 }
-
