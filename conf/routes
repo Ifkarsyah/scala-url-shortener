@@ -3,8 +3,6 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 #
 
-GET /api/ping           controllers.ApiController.ping
-
-# NEW
-GET /api/post/:postId           controllers.ApiController.getPost(postId: Int)
-GET /api/post/:postId/comments  controllers.ApiController.getComments(postId: Int)
+# URL Shortener
+POST    /shorturl                   controllers.URLController.shorten
+GET     /go/:shortURL               controllers.URLController.getOriginal(shortURL: String)
