@@ -25,8 +25,8 @@ class URLController @Inject()(cc: ControllerComponents,
 
   def getOriginal(shortURL: String): Action[AnyContent] = Action { implicit request =>
     urlService.getOriginal(shortURL) match {
-      case None => BadRequest("That's URL is not in our databases")
-      case Some(longURL) => Ok(Json.toJson(Map("longURL" -> longURL)))
+      case None => InternalServerError("Something wrong")
+      case Some(jsValue) => Ok(jsValue)
     }
   }
 }
