@@ -1,7 +1,6 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
-import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 import services.URLService
 
@@ -17,7 +16,7 @@ class URLController @Inject()(cc: ControllerComponents,
         val cleanedLongURL = (jsonBody \ "originalURL").as[String]
         val shortenServiceResponse = urlService.shorten(cleanedLongURL)
         shortenServiceResponse match {
-          case Some(shortURL) => Ok(Json.toJson(Map("shortURL" -> shortURL)))
+          case Some(shortURL) => Ok(shortURL)
           case None => InternalServerError("Something wrong")
         }
     }

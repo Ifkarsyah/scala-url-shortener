@@ -15,7 +15,7 @@ class URLService @Inject()(ur: RedisURLRepository, be: Base62Encoder) {
    * @param longURL ex: "https://blog.softwaremill.com/is-your-scala-object-always-a-singleton-cb3fd24a2fd9"
    * @return
    */
-  def shorten(longURL: String): Option[String] = {
+  def shorten(longURL: String): Option[JsValue] = {
     val integerURL: Long = be.encodeRawToBase10(longURL)
     val shortURL: String = be.encodeBase10To62(integerURL)
 
@@ -27,7 +27,20 @@ class URLService @Inject()(ur: RedisURLRepository, be: Base62Encoder) {
     )
 
     val repoResponse = ur.saveURL(shortURL, Json.stringify(urlInfo))
-    if (repoResponse) Some(shortURL) else None
+    if (repoResponse) Some(jsonTsToJsonDate(urlInfo)) else None
+  }
+
+  private def jsonTsToJsonDate(jsValue: JsValue): JsValue = {
+    Json.obj(
+      "shortURL" -> (Config.PLAY_HOST + "/go/" + (jsValue \ "shortURL").as[String]),
+      "createdAt" -> tsToDate((jsValue \ "createdAt").as[Long]),
+      "expiredAt" -> tsToDate((jsValue \ "expiredAt").as[Long])
+    )
+  }
+
+  private def tsToDate(ts: Long): String = {
+    val df = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss zzzz")
+    df.format(ts * 1000)
   }
 
   /**
@@ -42,16 +55,7 @@ class URLService @Inject()(ur: RedisURLRepository, be: Base62Encoder) {
       ))
       case Some(jsonString) =>
         val jsValue = Json.parse(jsonString)
-
-        val df = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss zzzz")
-        val dateCreated = df.format((jsValue \ "createdAt").as[Long] * 1000L)
-        val dateExpired = df.format((jsValue \ "expiredAt").as[Long] * 1000L)
-
-        Some(Json.obj(
-          "shortURL" -> (Config.PLAY_HOST + "/go/" + (jsValue \ "shortURL").as[String]),
-          "createdAt" -> dateCreated,
-          "expiredAt" -> dateExpired
-        ))
+        Some(jsonTsToJsonDate(jsValue))
     }
   }
 }
